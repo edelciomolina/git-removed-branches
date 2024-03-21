@@ -21,7 +21,7 @@ var setup = function () {
 	console.log('Using "' + tempdir + '" dir');
 
 	// create bare repository
-	child_process.execSync('git init --bare', { cwd: bareDir, stderr: 'stdio'});
+	child_process.execSync('git init --bare', { cwd: bareDir, stderr: 'stdio' });
 
 	// clone repository
 	child_process.execSync('git clone bare working', { cwd: tempdir });
@@ -63,8 +63,8 @@ var test_nothing = function () {
 	});
 
 	assert.notEqual(output.indexOf('- #333-work'), -1);
-  	assert.notEqual(output.indexOf('- feature/fast-forwarded'), -1);
-  	assert.notEqual(output.indexOf('- no-ff'), -1);
+	assert.notEqual(output.indexOf('- feature/fast-forwarded'), -1);
+	assert.notEqual(output.indexOf('- no-ff'), -1);
 };
 
 var testing_prune = function () {
@@ -88,8 +88,22 @@ var testing_force = function () {
 	assert.notEqual(output.indexOf('Deleted branch no-ff'), -1);
 };
 
+var test_branch_rename = function () {
+	// Renaming branch locally
+	child_process.execSync('git branch -m no-ff renamed-no-ff', { cwd: workingDir });
+
+	var output = child_process.execFileSync('node', [__dirname + path.sep + 'index.js'], {
+		cwd: workingDir,
+		encoding: 'utf8',
+	});
+
+	// Verifying renamed branch is still listed
+	assert.notEqual(output.indexOf('- renamed-no-ff'), -1);
+};
+
 setup();
 test_nothing();
 testing_prune();
 testing_force();
+test_branch_rename();
 console.log('We are good to go!');
